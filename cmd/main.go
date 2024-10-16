@@ -3,12 +3,13 @@ package main
 import (
 	"errors"
 	"fmt"
-	c "github.com/fatih/color"
-	trace "github.com/pl0th/go-traceroute"
-	"github.com/urfave/cli"
 	"net"
 	"os"
 	"time"
+
+	c "github.com/fatih/color"
+	trace "github.com/pl0th/go-traceroute"
+	"github.com/urfave/cli"
 )
 
 const AppVersion = "dev" // should be overwritten by ldflags
@@ -53,7 +54,11 @@ func main() {
 
 	app.Action = func(ctx *cli.Context) (err error) {
 		if len(ctx.Args()) == 0 {
-			cli.ShowAppHelp(ctx)
+			err = cli.ShowAppHelp(ctx)
+			if err != nil {
+				print(err)
+				return
+			}
 			return
 		}
 
@@ -107,7 +112,7 @@ func main() {
 						} else {
 							formString = fmt.Sprintf("%v ", latString[:4]+latString[len(latString)-2:])
 						}
-						fmt.Printf(c.MagentaString(formString)) //µs
+						fmt.Print(c.MagentaString(formString)) //µs
 					}
 					fmt.Println()
 				}
@@ -126,7 +131,10 @@ func main() {
 		return
 	}
 
-	app.Run(os.Args)
+	err := app.Run(os.Args)
+	if err != nil {
+		print(err)
+	}
 
 }
 

@@ -2,13 +2,14 @@ package traceroute
 
 import (
 	"errors"
-	"golang.org/x/net/icmp"
-	"golang.org/x/net/ipv4"
-	"golang.org/x/net/ipv6"
 	"math/rand"
 	"net"
 	"strconv"
 	"time"
+
+	"golang.org/x/net/icmp"
+	"golang.org/x/net/ipv4"
+	"golang.org/x/net/ipv6"
 )
 
 // Exec returns TraceData with initialized Hops and inserts the IP version into the protocol
@@ -54,7 +55,8 @@ func doHop(ttl int, dest net.IP, timeout time.Duration, proto string, port int, 
 	req := []byte{}
 	conn, err := createConnection(dest, port, ttl, ipv, proto)
 	if err != nil {
-
+		print(err)
+		return
 	}
 
 	listenAddress := "0.0.0.0"
@@ -147,7 +149,7 @@ func createConnection(dest net.IP, port, ttl int, ipv, proto string) (net.Conn, 
 	} else if proto == "icmp" {
 		dialProto = "ip" + ipv + ":" + proto
 	} else {
-		return  nil, errors.New("protocol not implemented")
+		return nil, errors.New("protocol not implemented")
 	}
 
 	conn, err := net.Dial(dialProto, destString)
@@ -155,7 +157,6 @@ func createConnection(dest net.IP, port, ttl int, ipv, proto string) (net.Conn, 
 		return nil, err
 	}
 	defer conn.Close()
-
 
 	if ipv == "4" {
 		newConn := ipv4.NewConn(conn)
